@@ -6,6 +6,7 @@ export const User = objectType({
 		t.string('id');
 		t.string('name');
 		t.string('email');
+		t.string('token');
 	},
 });
 
@@ -15,5 +16,6 @@ export const Login = objectType({
 		t.nonNull.string('email');
 		t.nonNull.boolean('error');
 		t.nonNull.string('name');
+		t.string('token');
 	},
 });

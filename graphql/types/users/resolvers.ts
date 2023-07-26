@@ -1,6 +1,6 @@
 import { FieldResolver } from 'nexus';
 import nookies from 'nookies';
-import { encodedToken } from '@utils';
+import { encodedToken, verifyToken } from '@utils';
 import bcrypt from 'bcrypt';
 
 export const loginResolver: FieldResolver<'Mutation', 'Login'> = async (
@@ -59,13 +59,39 @@ export const loginResolver: FieldResolver<'Mutation', 'Login'> = async (
 			error: false,
 			name: 'Testing User',
 			email: 'testing@gmail.com',
+			token,
 		};
 	} catch (err) {
 		throw new Error(err?.message);
 	}
 };
 
-export const registerResolver: FieldResolver<'Mutation', 'Register'> = async (
+export const verifyTokenResolver: FieldResolver<'Mutation', 'User'> = async (
+	_,
+	args: { token: string },
+	{ prisma }
+) => {
+	try {
+		const token = await verifyToken(args.token);
+
+		// check if user exists
+
+		await prisma.user.findUniqueOrThrow({
+			where: {
+				id: token?.id || undefined,
+			},
+		});
+
+		return {
+			email: token?.email,
+			name: token?.name,
+		};
+	} catch (err) {
+		throw new Error(err?.message);
+	}
+};
+
+export const registerResolver: FieldResolver<'Mutation', 'User'> = async (
 	_,
 	args: { email: string; password: string; name: string },
 	{ res, prisma }
@@ -120,7 +146,10 @@ export const registerResolver: FieldResolver<'Mutation', 'Register'> = async (
 			path: '/',
 		});
 
-		return user;
+		return {
+			...user,
+			token,
+		};
 	} catch (err) {
 		throw new Error(err?.message);
 	}

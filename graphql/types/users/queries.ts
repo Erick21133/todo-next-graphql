@@ -1,5 +1,9 @@
 import { extendType, nonNull, stringArg } from 'nexus';
-import { loginResolver, registerResolver } from './resolvers';
+import {
+	loginResolver,
+	registerResolver,
+	verifyTokenResolver,
+} from './resolvers';
 
 export const AuthQueries = extendType({
 	type: 'Mutation',
@@ -21,6 +25,13 @@ export const AuthQueries = extendType({
 				name: nonNull(stringArg()),
 			},
 			resolve: registerResolver,
+		});
+		t.field('verifyToken', {
+			type: 'User',
+			args: {
+				token: nonNull(stringArg()),
+			},
+			resolve: verifyTokenResolver,
 		});
 	},
 });

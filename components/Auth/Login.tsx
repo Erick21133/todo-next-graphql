@@ -7,15 +7,22 @@ import { useMutation } from '@apollo/client';
 
 import { Input, Button } from '@ui';
 import { queries } from '@utils';
-import { UiContext } from '@contexts';
+import { UiContext, AuthContext } from '@contexts';
 
-import type { UiContexts } from '@types';
+import type {
+	UiContexts,
+	AuthContext as AuthContextProps,
+	AuthenticatedResponse,
+} from '@types';
 
 export default function Login(): JSX.Element {
 	const router = useRouter();
 	const { toggleSnackbar } = useContext(UiContext) as UiContexts;
+	const { user, handleUser } = useContext(AuthContext) as AuthContextProps;
 
-	const [loginResolver, { loading, error }] = useMutation(queries.LOGIN);
+	const [loginResolver, { loading, error }] = useMutation<{
+		data: AuthenticatedResponse;
+	}>(queries.LOGIN);
 
 	const [values, setValues] = useState<{
 		email: string;
@@ -86,11 +93,18 @@ export default function Login(): JSX.Element {
 				return;
 			}
 
-			await loginResolver({
+			const response = await loginResolver({
 				variables: {
 					email: values?.email,
 					password: values?.password,
 				},
+			});
+
+			handleUser({
+				authenticated: true,
+				name: response.data?.data.name as string,
+				email: response.data?.data.email as string,
+				token: response.data?.data.token as string,
 			});
 
 			router.push('/');

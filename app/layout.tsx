@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
 import { ApolloProvider } from '@components';
-import { UiProvider } from '@contexts';
+import { UiProvider, AuthProvider } from '@contexts';
 
 const Snackbar = dynamic(() => import('../components/Snackbar'));
 
@@ -17,10 +17,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang='en'>
 			<body>
 				<ApolloProvider>
-					<UiProvider>
-						{children}
-						<Snackbar />
-					</UiProvider>
+					<AuthProvider>
+						<UiProvider>
+							{children}
+							<Snackbar />
+						</UiProvider>
+					</AuthProvider>
 				</ApolloProvider>
 			</body>
 		</html>

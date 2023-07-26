@@ -6,19 +6,35 @@ type Login {
   email: String!
   error: Boolean!
   name: String!
+  token: String
 }
 
 type Mutation {
+  createTodo(description: String, status: Boolean, title: String!, token: String!): Todo
+  deleteTodo(todoId: String!, token: String!): Todo
   login(email: String!, password: String!): Login
   register(email: String!, name: String!, password: String!): User
+  updateTodo(description: String, status: Boolean, title: String, todoId: String!, token: String!): Todo
+  verifyToken(token: String!): User
 }
 
 type Query {
-  ok: Boolean!
+  todos(token: String!): [Todo]
+}
+
+type Todo {
+  createdAt: String
+  description: String
+  id: String
+  status: Boolean
+  title: String
+  updatedAt: String
+  user_id: String
 }
 
 type User {
   email: String
   id: String
   name: String
+  token: String
 }
